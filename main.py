@@ -221,6 +221,14 @@ with st.sidebar:
     st.markdown("---")
     st.caption("Powered by Resemblyzer · v1.0.0")
 
+# 初始化所有需要的session state（在tabs之前，避免第一次切换tab时的状态初始化导致页面跳转）
+if "verification_counter" not in st.session_state:
+    st.session_state.verification_counter = 0
+if "enrollment_samples" not in st.session_state:
+    st.session_state.enrollment_samples = []
+if "enrollment_audio_files" not in st.session_state:
+    st.session_state.enrollment_audio_files = []
+
 # 使用tabs替代radio
 tab1, tab2, tab3 = st.tabs(["👤 注册用户", "🔐 验证身份", "📊 数据库管理"])
 
@@ -257,23 +265,17 @@ with tab1:
         with st.container():
             st.markdown("#### 📊 录制进度")
         
-        # 初始化session state存储录音
-        if "enrollment_samples" not in st.session_state:
-            st.session_state.enrollment_samples = []
-        if "enrollment_audio_files" not in st.session_state:
-            st.session_state.enrollment_audio_files = []
-        
         # 录制3段语音
-            current_progress = len(st.session_state.enrollment_samples)
-            progress_percentage = current_progress / 3
-            
-            col_prog1, col_prog2 = st.columns([4, 1])
-            with col_prog1:
-                st.progress(progress_percentage)
-            with col_prog2:
-                st.markdown(f"**{current_progress}/3** 完成")
-            
-            st.markdown("")
+        current_progress = len(st.session_state.enrollment_samples)
+        progress_percentage = current_progress / 3
+        
+        col_prog1, col_prog2 = st.columns([4, 1])
+        with col_prog1:
+            st.progress(progress_percentage)
+        with col_prog2:
+            st.markdown(f"**{current_progress}/3** 完成")
+        
+        st.markdown("")
         
         # 样本录制区
         st.markdown("#### 🎙️ 语音样本录制")
@@ -396,10 +398,6 @@ with tab2:
                 )
         
         st.markdown("---")
-        
-        # 初始化验证session state
-        if "verification_counter" not in st.session_state:
-            st.session_state.verification_counter = 0
         
         # 录音区域
         st.markdown("#### 🎙️ 语音录制")
