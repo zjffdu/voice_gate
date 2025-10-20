@@ -228,6 +228,8 @@ if "enrollment_samples" not in st.session_state:
     st.session_state.enrollment_samples = []
 if "enrollment_audio_files" not in st.session_state:
     st.session_state.enrollment_audio_files = []
+if "enrollment_audio_hashes" not in st.session_state:
+    st.session_state.enrollment_audio_hashes = [None, None, None]  # 跟踪每个样本的哈希值
 
 # 使用tabs替代radio
 tab1, tab2, tab3 = st.tabs(["👤 注册用户", "🔐 验证身份", "📊 数据库管理"])
@@ -296,44 +298,60 @@ with tab1:
                     audio_value = st.audio_input(f"录制语音", key=f"enroll_{i}", label_visibility="collapsed")
                 
                     if audio_value:
-                        # 保存到临时文件
-                        with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as tmp_file:
-                            tmp_file.write(audio_value.read())
-                            tmp_path = tmp_file.name
+                        # 获取音频的哈希值，避免重复处理同一个音频
+                        import hashlib
+                        audio_bytes = audio_value.getvalue()
+                        audio_hash = hashlib.md5(audio_bytes).hexdigest()
                         
-                        try:
-                            # 读取音频
-                            audio_data, sr = sf.read(tmp_path)
-                            
+                        # 只有当这是新的音频时才处理
+                        if st.session_state.enrollment_audio_hashes[i] != audio_hash:
+                            # 保存到临时文件
+                            with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as tmp_file:
+                                tmp_file.write(audio_bytes)
+                                tmp_path = tmp_file.name
+                        
+                            try:
+                                # 读取音频
+                                audio_data, sr = sf.read(tmp_path)
+                                
+                                st.audio(audio_value)
+                                
+                                # 显示音频信息
+                                duration = len(audio_data)/sr
+                                col_a, col_b = st.columns(2)
+                                with col_a:
+                                    st.caption(f"⏱️ {duration:.1f}s")
+                                with col_b:
+                                    st.caption(f"📊 {sr}Hz")
+                                
+                                # 提取特征
+                                with st.spinner("分析中..."):
+                                    embedding = embed_audio(audio_data, sr)
+                                
+                                # 保存音频文件
+                                saved_path = save_audio_sample(user_id, audio_data, sr, i+1)
+                                
+                                # 存储到session state
+                                if len(st.session_state.enrollment_samples) <= i:
+                                    st.session_state.enrollment_samples.append(embedding)
+                                    st.session_state.enrollment_audio_files.append(saved_path)
+                                else:
+                                    st.session_state.enrollment_samples[i] = embedding
+                                    st.session_state.enrollment_audio_files[i] = saved_path
+                                
+                                # 记录此音频的哈希值
+                                st.session_state.enrollment_audio_hashes[i] = audio_hash
+                                
+                                os.unlink(tmp_path)
+                            except Exception as e:
+                                st.error(f"处理失败: {e}")
+                                os.unlink(tmp_path)
+                        else:
+                            # 已经处理过这个音频，只显示播放器
                             st.audio(audio_value)
-                            
-                            # 显示音频信息
-                            duration = len(audio_data)/sr
-                            col_a, col_b = st.columns(2)
-                            with col_a:
-                                st.caption(f"⏱️ {duration:.1f}s")
-                            with col_b:
-                                st.caption(f"📊 {sr}Hz")
-                            
-                            # 提取特征
-                            with st.spinner("分析中..."):
-                                embedding = embed_audio(audio_data, sr)
-                            
-                            # 保存音频文件
-                            saved_path = save_audio_sample(user_id, audio_data, sr, i+1)
-                            
-                            # 存储到session state
-                            if len(st.session_state.enrollment_samples) <= i:
-                                st.session_state.enrollment_samples.append(embedding)
-                                st.session_state.enrollment_audio_files.append(saved_path)
-                            else:
-                                st.session_state.enrollment_samples[i] = embedding
-                                st.session_state.enrollment_audio_files[i] = saved_path
-                            
-                            os.unlink(tmp_path)
-                        except Exception as e:
-                            st.error(f"处理失败: {e}")
-                            os.unlink(tmp_path)
+                            if len(st.session_state.enrollment_samples) > i:
+                                duration = len(st.session_state.enrollment_samples[i])
+                                st.caption(f"✅ 已保存")
         
         # 注册按钮区
         st.markdown("---")
