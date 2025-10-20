@@ -343,14 +343,18 @@ with tab1:
                                 st.session_state.enrollment_audio_hashes[i] = audio_hash
                                 
                                 os.unlink(tmp_path)
+                                
+                                # 立即重新渲染以更新状态显示
+                                st.rerun()
+                                
                             except Exception as e:
                                 st.error(f"处理失败: {e}")
-                                os.unlink(tmp_path)
+                                if os.path.exists(tmp_path):
+                                    os.unlink(tmp_path)
                         else:
                             # 已经处理过这个音频，只显示播放器
                             st.audio(audio_value)
                             if len(st.session_state.enrollment_samples) > i:
-                                duration = len(st.session_state.enrollment_samples[i])
                                 st.caption(f"✅ 已保存")
         
         # 注册按钮区
