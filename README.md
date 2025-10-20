@@ -1,0 +1,1 @@
+这是一个能跑的 text-independent 声纹门禁 Demo
