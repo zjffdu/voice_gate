@@ -1205,20 +1205,6 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/2a/38/991bbf9fa3ed3d9c8e69265fc449bdaade8131c7f0f750dbd388c3c477dc/streamlit-1.50.0-py3-none-any.whl", hash = "sha256:9403b8f94c0a89f80cf679c2fcc803d9a6951e0fba542e7611995de3f67b4bb3", size = 10068477, upload-time = "2025-09-23T19:23:57.245Z" },
 ]
 
-[[package]]
-name = "streamlit-webrtc"
-version = "0.63.11"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "aioice" },
-    { name = "aiortc" },
-    { name = "packaging" },
-    { name = "streamlit" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/9b/9a/c0d7b23b3f1e987c098b8d20fc61b6e26dfab2b31e76f040636f3b45c902/streamlit_webrtc-0.63.11.tar.gz", hash = "sha256:1bcdd3e405386e4a3acbe4b9a7f4997b97650cac225f6c747f660cd46cc52fd9", size = 212912, upload-time = "2025-10-05T16:16:01.245Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/6c/64/6db9075ae6235b8bb8b7496873ad8f9e4ba33802329507aa6649c9e1af39/streamlit_webrtc-0.63.11-py3-none-any.whl", hash = "sha256:492db3a410ffb432bf4f8a44636f91935af5b9c8d6fcb51acb773472e96205b6", size = 220226, upload-time = "2025-10-05T16:15:59.367Z" },
-]
 
 [[package]]
 name = "tenacity"
@@ -1292,7 +1278,6 @@ dependencies = [
     { name = "numpy" },
     { name = "soundfile" },
     { name = "streamlit" },
-    { name = "streamlit-webrtc" },
 ]
 
 [package.metadata]
@@ -1300,7 +1285,6 @@ requires-dist = [
     { name = "numpy", specifier = ">=1.21.0,<2.0" },
     { name = "soundfile", specifier = ">=0.13.1" },
     { name = "streamlit", specifier = ">=1.50.0" },
-    { name = "streamlit-webrtc", specifier = ">=0.63.11" },
 ]
 
 [[package]]
