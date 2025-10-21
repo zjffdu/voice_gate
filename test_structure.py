@@ -8,31 +8,31 @@ def test_imports():
     print("🧪 测试模块导入...")
     
     try:
-        from src import config
+        from voice_gate import config
         print("✅ config模块导入成功")
         
-        from src import audio_processor
+        from voice_gate import audio_processor
         print("✅ audio_processor模块导入成功")
         
-        from src import database
+        from voice_gate import database
         print("✅ database模块导入成功")
         
-        from src import verifier
+        from voice_gate import verifier
         print("✅ verifier模块导入成功")
         
-        from src import ui_styles
+        from voice_gate import ui_styles
         print("✅ ui_styles模块导入成功")
         
-        from src.ui import sidebar
+        from voice_gate.ui import sidebar
         print("✅ sidebar组件导入成功")
         
-        from src.ui import enrollment_page
+        from voice_gate.ui import enrollment_page
         print("✅ enrollment_page组件导入成功")
         
-        from src.ui import verification_page
+        from voice_gate.ui import verification_page
         print("✅ verification_page组件导入成功")
         
-        from src.ui import database_page
+        from voice_gate.ui import database_page
         print("✅ database_page组件导入成功")
         
         print("\n✅ 所有模块导入测试通过！")
@@ -48,7 +48,7 @@ def test_config():
     print("\n🧪 测试配置模块...")
     
     try:
-        from src.config import (
+        from voice_gate.config import (
             DB_PATH, AUDIO_DIR, MODEL_SAMPLE_RATE,
             EMBEDDING_DIM, ENROLLMENT_SAMPLES_COUNT, DEFAULT_THRESHOLD
         )
@@ -73,7 +73,7 @@ def test_database_functions():
     print("\n🧪 测试数据库函数...")
     
     try:
-        from src.database import load_db, get_user_stats
+        from voice_gate.database import load_db, get_user_stats
         
         # 测试加载数据库
         db = load_db()

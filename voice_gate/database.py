@@ -15,22 +15,26 @@ def load_db():
         dict: 用户数据库
     """
     if os.path.exists(DB_PATH):
-        with open(DB_PATH, "rb") as f:
-            db = pickle.load(f)
-            
-            # 兼容旧版数据库（如果是旧格式，转换为新格式）
-            if db and isinstance(list(db.values())[0], np.ndarray):
-                # 旧格式：{user_id: embedding}
-                # 转换为新格式：{user_id: {"embedding": embedding, "samples": []}}
-                new_db = {}
-                for user_id, embedding in db.items():
-                    new_db[user_id] = {
-                        "embedding": embedding,
-                        "samples": [],
-                        "created_at": datetime.now().isoformat()
-                    }
-                return new_db
-            return db
+        try:
+            with open(DB_PATH, "rb") as f:
+                db = pickle.load(f)
+        except (pickle.PickleError, EOFError):
+            # 文件损坏时返回空库，避免应用崩溃
+            return {}
+
+        # 兼容旧版本结构：旧版直接保存 embedding 数组
+        if db and isinstance(next(iter(db.values())), np.ndarray):
+            new_db = {}
+            for user_id, embedding in db.items():
+                new_db[user_id] = {
+                    "embedding": embedding,
+                    "samples": [],
+                    "created_at": datetime.now().isoformat()
+                }
+            save_db(new_db)
+            return new_db
+
+        return db
     return {}
 
 
@@ -47,7 +51,7 @@ def save_db(db):
 
 def create_user(user_id, prototype_embedding, audio_files):
     """
-    创建新用户记录
+    创建新用户记录并保存到数据库
     
     Args:
         user_id: 用户ID
@@ -57,11 +61,15 @@ def create_user(user_id, prototype_embedding, audio_files):
     Returns:
         dict: 用户数据字典
     """
-    return {
+    db = load_db()
+    user_data = {
         "embedding": prototype_embedding,
         "samples": audio_files.copy(),
         "created_at": datetime.now().isoformat()
     }
+    db[user_id] = user_data
+    save_db(db)
+    return user_data
 
 
 def delete_user(db, user_id):
