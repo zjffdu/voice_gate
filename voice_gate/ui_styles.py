@@ -2,7 +2,7 @@
 
 # 页面标题样式
 MAIN_HEADER_HTML = '<h1 class="main-header">🎙️ Voice Gate</h1>'
-SUB_HEADER_HTML = '<p class="sub-header">企业级声纹识别与身份验证平台</p>'
+SUB_HEADER_HTML = '<p class="sub-header">家庭卫士声纹识别与身份验证平台</p>'
 
 # CSS样式
 CUSTOM_CSS = """
